@@ -17,9 +17,9 @@ variable "instance_type" {
 variable "instance_names" {
   type = list(string)
   default = [
-    "Jenkins-Master",
-    "Jenkins-Node",
-    "Ansible-Master",
-    "Nexus-Master"
+    "jenkins_vm",
+    "sonarqube_vm",
+    "nexus_vm",
+    "jenkins_slave_vm"
   ]
 }
