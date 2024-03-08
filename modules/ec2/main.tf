@@ -24,7 +24,7 @@ resource "null_resource" "copy_ssh_key" {
       type        = "ssh"
       user        = "ubuntu"              # Change if your instance uses a different username
       private_key = file("~/.ssh/id_rsa") # Path to your private key
-      host        = self.public_ip
+      host        = aws_instance.ec2[count.index].public_ip
     }
   }
 }
