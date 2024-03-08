@@ -8,7 +8,6 @@ resource "aws_instance" "ec2" {
 
   tags = {
     Name = "${var.instance_names[count.index]}"
-    PublicDNS    = aws_instance.ec2[count.index].public_dns
   }
 }
 
