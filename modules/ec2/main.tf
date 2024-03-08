@@ -14,18 +14,19 @@ resource "aws_instance" "ec2" {
 resource "null_resource" "copy_ssh_key" {
   count = length(aws_instance.ec2)
 
+  connection {
+    type  = "ssh"
+    host  = aws_instance.ec2[count.index].public_ip
+    user  = var.ssh_user
+    port  = var.ssh_port
+    agent = true
+  }
+
   provisioner "remote-exec" {
     inline = [
       "echo '${file("~/.ssh/id_rsa.pub")}' >> ~/.ssh/authorized_keys",
       "chmod 700 ~/.ssh",
       "chmod 600 ~/.ssh/authorized_keys"
     ]
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"              # Change if your instance uses a different username
-      private_key = file("~/.ssh/id_rsa") # Path to your private key
-      host        = aws_instance.ec2[count.index].public_ip
-    }
   }
 }

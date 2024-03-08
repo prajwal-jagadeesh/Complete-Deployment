@@ -1,4 +1,4 @@
-ami                  = "ami-03f4878755434977f"
+ami                  = "ami-03bb6d83c60fc5f7c"
 instance_type        = "t2.medium"
 ssh_port             = "22"
 http_port            = "80"
