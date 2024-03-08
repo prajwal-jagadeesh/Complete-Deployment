@@ -12,8 +12,7 @@ resource "aws_instance" "ec2" {
               EOF
 
   tags = {
-    Name = "mywebserver-${terraform.workspace}-${count.index}"
-    "Purpose" = var.instance_purpose[count.index]
+    Name = "${var.instance_names[count.index]}-${terraform.workspace}-${count.index}"
   }
 }
 
@@ -25,12 +24,12 @@ resource "null_resource" "copy_ssh_key" {
     type        = "ssh"
     host        = aws_instance.ec2[count.index].public_ip
     user        = "ubuntu"                            # Change to your desired username
-    private_key = file("./webapp.pem")                # Change to your private key path
+    private_key = file("~/.ssh/id_rsa")                # Change to your private key path
   }
     
   provisioner "remote-exec" {
     inline = [
-      "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDArVKSMVU9SVZNa99Jun6ltAlQ4Y4f+1DxnJ03IJpQALkMtcjzsDm1r746F2bktzgIwf6GPKHi6a3clFgrC0y9Ki7ZrJBJ+GoaA7aHIHNnotb3tZSk6Z3lnWox2iaBTRkk29A1T2+sk7CDatBJJ1seXOyBp20bRe8OZdu3XXf4C8r5o5U9YRojjof4+xuwDqrWg0iVrVxhNlIroTqcUvx9jzrzkpxqBv9UAiji5/lpXxu2WjX+EVSsBJUpprRLpkpgbuQXFiQ645bsIPRz7psvxUFYU0TUTiU2loFQj6cTTi3lepNGc5BcUtB5BkPTVawocDzwuzrePtQwmkvs9TW7gXb+fCEnkYMQ2maaG09X+EX2ESTSWqYXmIw5wn58iM8pyeXNl+Yyp5D8vTMlcDIFScYVExpg4eE9Zseonz1CuflaLaNJiDjk2KPps8WjpW5Jr4cMTqoADFrP86iuq34HZxOvBoWNhVJT/9VHRI36Bvywixyfsj3bEaHbnFU6t9fXkpye/8tkzc+4ZgKVYYqF040nzlTlJCPkXZp0Xa6+TcQ9wfYGCSOktiYG5O3go061OT3IPpUvj2jcRs6vjAOj/jxBpuvXksWu+eXV4Yq39lyCk1+RG28np7KOnVOnMfl1twUPFjUHsNR1hyOEVdHUiwWlIygLDDgk5yC+TsolPw== user@DESKTOP-ENJQQBJ' >> ~/.ssh/authorized_keys" # Change to your public key
+      "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDkndMMNnne0tjbizpvk3ybU9pVXUdCIOlp8TNJq5f1cbZm9HUs73OdPfjNauiPZWSYuZzOEYPSVq0Dg1NAvTb6xCrR/ML1FXFqaSaLgDrggayoy326rEYuwysFbPPcuda5GYTGmbH8txn+VX+Bh2ct3rJbBAK8G/9L+oZxkMmT3wqkW9uDyFbtFaNaYE31xvw3bIrMM6K7twuM++rmD2/nUF8sSX7TtDIAFQXOYxNB7Ie8tNAOGgtlitfgeTfADRhWEBv5nhjehqBg3bnF4SzcFbQQAOuYjXyIcAKceKHysmTs1dCy8R3obOUinlrAUl+i1pKXWz9H9KT4t0YJO1oR8A7DGKR8vtFUAJrrzRj06beQp3xJG0Hx9nJTNXvuaKV8ENl6Te9hLt/wn3+VKs/Tr/HudHhenHwSTqHmTZ5kGrV4ot4+PeoyscFdJtTPZIoz/tCGlEQgpiwADaAKG+IbCt4/5/4bqb5c3VwxQKtAazXFyvyFo5CcOA0iAPJq05eXq7Y6JjJciXojrUD4MSPPEREGEKA+fHPhUhg+rNOL2T96dKi//aPiyUHID6cHjVIeLHba+iYgpF+f/IXrgSWJqXm9JBnEmotwSrbKrys3RSR9lOc4acGUUeRfGxEsCv845sAGvVFHz4UDHh57tn8Z6pTkM+UXx17SeQVN1qJ69Q== ubuntu@ip-172-31-14-242' >> ~/.ssh/authorized_keys" # Change to your public key
     ]
   }
 }
