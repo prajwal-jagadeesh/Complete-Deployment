@@ -3,7 +3,7 @@ module "ec2" {
   ami               = var.ami
   instance_type     = var.instance_type
   security_group_id = module.sg.security_group_id
-  subnet_id = module.EKS-VPC.public-subnet1
+  subnet_id         = module.EKS-VPC.public-subnet1
 }
 
 module "sg" {
