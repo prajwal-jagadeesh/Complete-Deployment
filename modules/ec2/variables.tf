@@ -6,6 +6,10 @@ variable "security_group_id" {
   description = "Security Group"
 }
 
+variable "subnet_id" {
+  description = "subnet Id"
+}
+
 variable "instance_type" {
   description = "intance type"
 }
