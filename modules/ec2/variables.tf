@@ -2,6 +2,10 @@ variable "ami" {
   description = "AMI"
 }
 
+variable "security_group_id" {
+  description = "Security Group"
+}
+
 variable "instance_type" {
   description = "intance type"
 }
