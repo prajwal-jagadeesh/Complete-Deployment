@@ -51,6 +51,12 @@
         url: "{{ sonarqube_url }}"
         dest: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
 
+    - name: Create SonarQube user
+      user:
+        name: sonarqube
+        shell: /bin/bash
+        system: yes
+
     - name: Unzip SonarQube
       unarchive:
         src: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
