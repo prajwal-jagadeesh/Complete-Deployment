@@ -28,11 +28,18 @@
         url: "https://download.sonatype.com/nexus/3/latest-unix.tar.gz"
         dest: /tmp/nexus/
 
+    - name: Find Nexus Tarball
+      ansible.builtin.find:
+        paths: /tmp/nexus/
+        patterns: "nexus-*.tar.gz"
+      register: nexus_tarball
+
     - name: Extract Nexus Tarball
       ansible.builtin.unarchive:
-        src: /tmp/nexus/nexus-*
+        src: "{{ nexus_tarball.files[0].path }}"
         dest: /opt
         remote_src: yes
+      when: nexus_tarball.matched > 0
 
     - name: Rename Nexus Directory
       ansible.builtin.command:
