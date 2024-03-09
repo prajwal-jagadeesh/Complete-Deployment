@@ -8,6 +8,16 @@ module "ec2" {
   protocol      = var.protocol
 }
 
+module "virtual-machines" {
+  source        = "./modules/virtual-machines"
+  ami           = var.ami
+  instance_type = var.instance_type
+  ssh_port      = var.ssh_port
+  http_port     = var.http_port
+  https_port    = var.https_port
+  protocol      = var.protocol
+}
+
 # module "sg" {
 #   source     = "./modules/sg"
 #   ssh_port   = var.ssh_port
