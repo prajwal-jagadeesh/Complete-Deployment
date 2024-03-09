@@ -2,29 +2,36 @@
 - name: Install Jenkins
   hosts: jenkins_vm
   become: yes
-
-  vars:
-    jenkins_repo_key: "https://pkg.jenkins.io/debian/jenkins.io.key"
-    jenkins_repo_url: "https://pkg.jenkins.io/debian"
   tasks:
-    - name: Add Jenkins repository key
-      apt_key:
-        url: "{{ jenkins_repo_key }}"
-        state: present
-
-    - name: Add Jenkins repository
-      apt_repository:
-        repo: "deb {{ jenkins_repo_url }} binary/"
-        state: present
-
     - name: Update apt cache
       apt:
         update_cache: yes
 
-    - name: Install Java
+    - name: Install fontconfig
       apt:
-        name: openjdk-11-jdk
+        name: fontconfig
         state: present
+
+    - name: Install OpenJDK 17
+      apt:
+        name: openjdk-17-jre
+        state: present
+
+    - name: Download Jenkins repository key
+      get_url:
+        url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key"
+        dest: "/usr/share/keyrings/jenkins-keyring.asc"
+
+    - name: Add Jenkins repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: "jenkins"
+
+    - name: Update apt cache after adding Jenkins repository
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
 
     - name: Install Jenkins
       apt:
