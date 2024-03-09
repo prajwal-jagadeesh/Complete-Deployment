@@ -1,93 +1,66 @@
 ---
-- name: Install and Run SonarQube
+- name: Install Docker and run SonarQube as a container
   hosts: sonarqube_vm
   become: yes
   vars:
-    sonarqube_version: "8.9.2.46101"  # Change this to the desired SonarQube version
-    sonarqube_url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-{{ sonarqube_version }}.zip"
-    sonarqube_install_dir: "/opt/sonarqube"
-    sonarqube_home: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}"
-    sonarqube_conf_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/conf"
-    sonarqube_data_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/data"
-    sonarqube_logs_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/logs"
-    sonarqube_temp_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/temp"
-
+    sonarqube_version: "latest"  # Set SonarQube version to "latest" or specify a specific version if needed
+    sonarqube_port: "9000"       # SonarQube port
+    sonarqube_container_name: "sonarqube"  # Name of the SonarQube container
+    sonarqube_data_dir: "/opt/sonarqube/data"  # Directory to persist SonarQube data
+    sonarqube_logs_dir: "/opt/sonarqube/logs"  # Directory to persist SonarQube logs
   tasks:
-    - name: Install unzip
+    - name: Install Docker prerequisites
       apt:
-        name: unzip
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
         state: present
 
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-
-    - name: Install fontconfig
-      apt:
-        name: fontconfig
+    - name: Add Docker GPG apt key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
-    - name: Install OpenJDK 17
-      apt:
-        name: openjdk-17-jre
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         state: present
 
-    - name: Create SonarQube directories
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create directories for SonarQube data and logs
       file:
         path: "{{ item }}"
         state: directory
-        mode: 0755
-        recurse: yes
+        mode: '0755'
       with_items:
-        - "{{ sonarqube_install_dir }}"
-        - "{{ sonarqube_home }}"
-        - "{{ sonarqube_conf_dir }}"
         - "{{ sonarqube_data_dir }}"
         - "{{ sonarqube_logs_dir }}"
-        - "{{ sonarqube_temp_dir }}"
 
-    - name: Download SonarQube
-      get_url:
-        url: "{{ sonarqube_url }}"
-        dest: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
+    - name: Pull SonarQube Docker image
+      docker_image:
+        name: sonarqube:{{ sonarqube_version }}
+        source: pull
 
-    - name: Create SonarQube user
-      user:
-        name: sonarqube
-        shell: /bin/bash
-        system: yes
-
-    - name: Unzip SonarQube
-      unarchive:
-        src: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
-        dest: "{{ sonarqube_install_dir }}"
-        remote_src: yes
-        owner: sonarqube
-        group: sonarqube
-
-    - name: Set SonarQube directories ownership
-      file:
-        path: "{{ item }}"
-        owner: sonarqube
-        group: sonarqube
-        recurse: yes
-      with_items:
-        - "{{ sonarqube_home }}"
-        - "{{ sonarqube_data_dir }}"
-        - "{{ sonarqube_logs_dir }}"
-        - "{{ sonarqube_temp_dir }}"
-
-    - name: Configure SonarQube properties
-      template:
-        src: sonar.properties.j2
-        dest: "{{ sonarqube_conf_dir }}/sonar.properties"
-        owner: sonarqube
-        group: sonarqube
-      notify:
-        - Restart SonarQube
-
-  handlers:
-    - name: Restart SonarQube
-      systemd:
-        name: sonarqube.service
-        state: restarted
+    - name: Run SonarQube container
+      docker_container:
+        name: "{{ sonarqube_container_name }}"
+        image: sonarqube:{{ sonarqube_version }}
+        ports:
+          - "{{ sonarqube_port }}:{{ sonarqube_port }}"
+        volumes:
+          - "{{ sonarqube_data_dir }}:/opt/sonarqube/data"
+          - "{{ sonarqube_logs_dir }}:/opt/sonarqube/logs"
+        detach: yes
