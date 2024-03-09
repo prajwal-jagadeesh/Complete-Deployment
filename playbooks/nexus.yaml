@@ -20,7 +20,7 @@
 
     - name: Extract Nexus Tarball
       ansible.builtin.unarchive:
-        src: /tmp/latest-*
+        src: /tmp/latest-unix.tar.gz
         dest: /opt/
         remote_src: yes
 
