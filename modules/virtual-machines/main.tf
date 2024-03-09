@@ -19,6 +19,22 @@ resource "null_resource" "hosts" {
   }
   count = length(aws_instance.web)
 
+  connection {
+    type = "ssh"
+    host = aws_instance.web[count.index].public_ip
+    user = "ubuntu"
+    private_key = "${file("~/.ssh/id_rsa")}"
+    agent = false
+  }
+
+  provisioner "remote-exec" {
+    inline = [ 
+      "echo ${file("~/.ssh/id_rsa.pub")}' >> ~/.ssh/authorized_keys",
+      "chmod 700 ~/.ssh",
+      "chmod 600 ~/.ssh/authorized_keys"
+     ]
+  }
+
   provisioner "local-exec" {
     command = "echo ${element(aws_instance.web[*].public_ip, count.index)} >> ./hosts"
     when    = create
