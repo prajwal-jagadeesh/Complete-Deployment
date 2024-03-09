@@ -30,7 +30,7 @@
       apt:
         name: openjdk-17-jre
         state: present
-        
+
     - name: Create SonarQube directories
       file:
         path: "{{ item }}"
@@ -50,12 +50,13 @@
         url: "{{ sonarqube_url }}"
         dest: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
 
-    - name: Unzip SonarQube
+    - name: Extract SonarQube archive
       unarchive:
-        src: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
+        src: "/tmp/sonarqube-{{ sonarqube_version }}.zip"
         dest: "{{ sonarqube_install_dir }}"
         remote_src: yes
-        extra_opts: "--owner=sonarqube --group=sonarqube"
+        extra_opts: --owner=sonarqube --group=sonarqube
+
 
     - name: Set SonarQube directories ownership
       file:
