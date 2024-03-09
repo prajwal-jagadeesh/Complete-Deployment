@@ -49,6 +49,12 @@
         - "{{ sonarqube_data_dir }}"
         - "{{ sonarqube_logs_dir }}"
 
+    - name: Add current user to docker group
+      command: "sudo usermod -aG docker {{ ansible_user }}"
+
+    - name: Change Docker socket permissions
+      command: "sudo chmod 777 /var/run/docker.sock"
+
     - name: Pull SonarQube Docker image
       docker_image:
         name: sonarqube:{{ sonarqube_version }}
