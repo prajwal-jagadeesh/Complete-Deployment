@@ -51,12 +51,13 @@
         url: "{{ sonarqube_url }}"
         dest: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
 
-    - name: Extract SonarQube archive
+    - name: Unzip SonarQube
       unarchive:
         src: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
-        dest: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}"
+        dest: "{{ sonarqube_install_dir }}"
         remote_src: yes
-        extra_opts: --owner=sonarqube --group=sonarqube
+        extra_opts: "--owner=sonarqube --group=sonarqube"
+
 
 
     - name: Set SonarQube directories ownership
