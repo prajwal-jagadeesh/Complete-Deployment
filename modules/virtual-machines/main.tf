@@ -8,7 +8,7 @@ resource "aws_instance" "web" {
     Environment = "dev"
   }
 
-  key_name        = aws_key_pair.terraform-demo-key.key_name
+  key_name        = aws_key_pair.terraform-demo.key_name
   security_groups = ["allow_ssh_http_sg"]
 }
 
