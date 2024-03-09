@@ -16,11 +16,11 @@
     - name: Download Nexus Tarball
       get_url:
         url: "https://download.sonatype.com/nexus/3/latest-unix.tar.gz"
-        dest: /tmp/nexus.tar.gz
+        dest: /tmp/
 
     - name: Extract Nexus Tarball
       ansible.builtin.unarchive:
-        src: /tmp/nexus.tar.gz
+        src: /tmp/
         dest: /opt/
         remote_src: yes
 
