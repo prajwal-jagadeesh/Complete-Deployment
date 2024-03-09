@@ -7,10 +7,10 @@
     - name: Update apt cache
       apt:
         update_cache: yes
-        
-    - name: Install Java
-      package:
-        name: java-1.8.0-openjdk
+
+    - name: Install OpenJDK 17
+      apt:
+        name: openjdk-17-jre
         state: present
 
     - name: Download Nexus Tarball
