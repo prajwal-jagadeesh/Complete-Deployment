@@ -1,72 +1,36 @@
 ---
-- name: Install Docker and run SonarQube as a container
+- name: Install Docker and SonarQube using Ansible
   hosts: sonarqube_vm
   become: yes
-  vars:
-    sonarqube_version: "latest"  # Set SonarQube version to "latest" or specify a specific version if needed
-    sonarqube_port: "9000"       # SonarQube port
-    sonarqube_container_name: "sonarqube"  # Name of the SonarQube container
-    sonarqube_data_dir: "/opt/sonarqube/data"  # Directory to persist SonarQube data
-    sonarqube_logs_dir: "/opt/sonarqube/logs"  # Directory to persist SonarQube logs
   tasks:
-    - name: Install Docker prerequisites
+    - name: Update package cache
       apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg
-          - lsb-release
-        state: present
-
-    - name: Add Docker GPG apt key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-
-    - name: Add Docker repository
-      apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
-        state: present
+        update_cache: yes
 
     - name: Install Docker
       apt:
-        name: docker-ce
+        name: docker.io
         state: present
+      become: yes
 
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
+    - name: Add user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
 
-    - name: Create directories for SonarQube data and logs
+    - name: Reinitialize group membership
+      shell: newgrp docker
+
+    - name: Change permissions for docker.sock
       file:
-        path: "{{ item }}"
-        state: directory
-        mode: '0755'
-      with_items:
-        - "{{ sonarqube_data_dir }}"
-        - "{{ sonarqube_logs_dir }}"
-
-    - name: Add current user to docker group
-      command: "sudo usermod -aG docker $USER"
-
-    - name: Change Docker socket permissions
-      command: "sudo chmod 777 /var/run/docker.sock"
-
-    - name: Pull SonarQube Docker image
-      docker_image:
-        name: sonarqube:{{ sonarqube_version }}
-        source: pull
+        path: /var/run/docker.sock
+        mode: '0777'
 
     - name: Run SonarQube container
       docker_container:
-        name: "{{ sonarqube_container_name }}"
-        image: sonarqube:{{ sonarqube_version }}
+        name: sonar
+        image: sonarqube:lts-community
         ports:
-          - "{{ sonarqube_port }}:{{ sonarqube_port }}"
-        volumes:
-          - "{{ sonarqube_data_dir }}:/opt/sonarqube/data"
-          - "{{ sonarqube_logs_dir }}:/opt/sonarqube/logs"
-        detach: yes
+          - "9000:9000"
+        state: started
