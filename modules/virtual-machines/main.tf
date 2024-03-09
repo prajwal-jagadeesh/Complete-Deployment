@@ -20,7 +20,7 @@ resource "null_resource" "hosts" {
   count = length(aws_instance.web)
 
   provisioner "local-exec" {
-    command = "echo ${element(aws_instance.web[*].public_ip, count_index)} >> ./hosts"
+    command = "echo ${element(aws_instance.web[*].public_ip, count.index)} >> ./hosts"
     when    = create
   }
 
