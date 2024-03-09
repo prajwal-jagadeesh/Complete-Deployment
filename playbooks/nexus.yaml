@@ -16,11 +16,7 @@
       apt:
         name: openjdk-17-jre
         state: present
-
-    - name: Install OpenJDK 8
-      apt:
-        name: openjdk-8-jdk
-        state: present
+        
     - name: Download Nexus
       get_url:
         url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
