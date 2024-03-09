@@ -9,7 +9,7 @@ resource "aws_instance" "web" {
   }
 
   key_name        = aws_key_pair.terraform-demo.key_name
-  security_groups = [ aws_security_group.allow_ssh_http_sg.id ]
+  vpc_security_group_ids = [ aws_security_group.allow_ssh_http_sg.id ]
 }
 
 resource "null_resource" "hosts" {
