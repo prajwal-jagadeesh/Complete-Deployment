@@ -89,5 +89,5 @@
   handlers:
     - name: Restart SonarQube
       systemd:
-        name: sonarqube
+        name: sonarqube.service
         state: restarted
