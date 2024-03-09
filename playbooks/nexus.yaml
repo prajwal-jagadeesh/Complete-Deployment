@@ -41,9 +41,16 @@
         remote_src: yes
       when: nexus_tarball.matched > 0
 
+    - name: Find Nexus Tarball
+      ansible.builtin.find:
+        paths: /opt/
+        patterns: "nexus-*"
+      register: sonatype_nexus
+
     - name: Rename Nexus Directory
       ansible.builtin.command:
-        cmd: mv /opt/nexus-* /opt/nexus
+        cmd: mv {{ sonatype_nexus.files[0].path }}" /opt/nexus
+      when: sonatype_nexus.matched > 0
 
     - name: Create Nexus User
       ansible.builtin.user:
