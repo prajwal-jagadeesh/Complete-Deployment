@@ -30,7 +30,7 @@
 
     - name: Extract Nexus Tarball
       ansible.builtin.unarchive:
-        src: /tmp/nexus/*
+        src: /tmp/nexus/nexus-*
         dest: /opt
         remote_src: yes
 
