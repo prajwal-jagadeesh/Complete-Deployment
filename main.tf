@@ -15,6 +15,9 @@ module "virtual-machines" {
   ssh_port      = var.ssh_port
   http_port     = var.http_port
   https_port    = var.https_port
+  jenkins_port  = var.jenkins_port
+  sonar_port    = var.sonar_port
+  nexus_port    = var.nexus_port
   protocol      = var.protocol
 }
 

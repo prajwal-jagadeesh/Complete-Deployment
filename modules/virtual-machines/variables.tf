@@ -32,6 +32,18 @@ variable "https_port" {
   description = "The HTTP port to allow inbound traffic"
 }
 
+variable "jenkins_port" {
+  description = "The HTTP port to allow inbound traffic"
+}
+
+variable "sonar_port" {
+  description = "The HTTP port to allow inbound traffic"
+}
+
+variable "nexus_port" {
+  description = "The HTTP port to allow inbound traffic"
+}
+
 variable "protocol" {
   description = "protocol"
 }
