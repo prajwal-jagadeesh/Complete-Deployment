@@ -18,7 +18,7 @@ resource "null_resource" "copy_ssh_key" {
     type  = "ssh"
     host  = aws_instance.ec2[count.index].public_ip
     user  = var.ssh_user
-    port  = var.ssh_port
+    port  = var.EC2_ssh_port
     agent = true
   }
 
