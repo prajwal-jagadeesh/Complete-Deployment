@@ -29,7 +29,7 @@ resource "null_resource" "hosts" {
 
   provisioner "remote-exec" {
     inline = [
-      "echo ${file("~/.ssh/id_rsa.pub")}' >> ~/.ssh/authorized_keys",
+      "echo ${file("~/.ssh/id_rsa.pub")} >> ~/.ssh/authorized_keys",
       "chmod 700 ~/.ssh",
       "chmod 600 ~/.ssh/authorized_keys"
     ]
