@@ -21,7 +21,7 @@ resource "null_resource" "hosts" {
 
   connection {
     type        = "ssh"
-    host        = self.public_ip
+    host        = aws_instance.web[count.index].public_ip
     user        = "ubuntu"
     private_key = file("~/.ssh/id_rsa")
     agent       = false
@@ -33,15 +33,5 @@ resource "null_resource" "hosts" {
       "chmod 700 ~/.ssh",
       "chmod 600 ~/.ssh/authorized_keys"
     ]
-  }
-
-  provisioner "local-exec" {
-    command = "echo ${element(aws_instance.web[*].public_ip, count.index)} >> ./hosts"
-    when    = create
-  }
-
-  provisioner "local-exec" {
-    command = "rm -f ./hosts"
-    when    = destroy
   }
 }
