@@ -1,25 +1,76 @@
 ---
-- name: Install SonarQube Server
+- name: Install and Run SonarQube
   hosts: sonarqube_vm
-  become: true
+  become: yes
+  vars:
+    sonarqube_version: "8.9.2.46101"  # Change this to the desired SonarQube version
+    sonarqube_url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-{{ sonarqube_version }}.zip"
+    sonarqube_install_dir: "/opt/sonarqube"
+    sonarqube_home: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}"
+    sonarqube_conf_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/conf"
+    sonarqube_data_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/data"
+    sonarqube_logs_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/logs"
+    sonarqube_temp_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/temp"
   tasks:
-  - name: Install OpenJDK 11
-    apt:
-      name: openjdk-11-jdk
-      state: present
-  - name: Download SonarQube
-    get_url:
-      url: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.1.44547.zip
-      dest: /opt/sonarqube.zip
-  - name: Unzip SonarQube
-    unarchive:
-      src: /opt/sonarqube.zip
-      dest: /opt/
-      remote_src: yes
-  - name: Set Permissions
-    file:
-      path: /opt/sonarqube
-      state: directory
-      mode: '0755'
-  - name: Start SonarQube Service
-    command: /opt/sonarqube/bin/linux-x86-64/sonar.sh start
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present
+
+    - name: Install OpenJDK
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+    - name: Create SonarQube directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+        recurse: yes
+      with_items:
+        - "{{ sonarqube_install_dir }}"
+        - "{{ sonarqube_home }}"
+        - "{{ sonarqube_conf_dir }}"
+        - "{{ sonarqube_data_dir }}"
+        - "{{ sonarqube_logs_dir }}"
+        - "{{ sonarqube_temp_dir }}"
+
+    - name: Download SonarQube
+      get_url:
+        url: "{{ sonarqube_url }}"
+        dest: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
+
+    - name: Unzip SonarQube
+      unarchive:
+        src: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
+        dest: "{{ sonarqube_install_dir }}"
+        remote_src: yes
+        extra_opts: "--owner=sonarqube --group=sonarqube"
+
+    - name: Set SonarQube directories ownership
+      file:
+        path: "{{ item }}"
+        owner: sonarqube
+        group: sonarqube
+        recurse: yes
+      with_items:
+        - "{{ sonarqube_home }}"
+        - "{{ sonarqube_data_dir }}"
+        - "{{ sonarqube_logs_dir }}"
+        - "{{ sonarqube_temp_dir }}"
+
+    - name: Configure SonarQube properties
+      template:
+        src: sonar.properties.j2
+        dest: "{{ sonarqube_conf_dir }}/sonar.properties"
+        owner: sonarqube
+        group: sonarqube
+      notify:
+        - Restart SonarQube
+
+  handlers:
+    - name: Restart SonarQube
+      systemd:
+        name: sonarqube
+        state: restarted
