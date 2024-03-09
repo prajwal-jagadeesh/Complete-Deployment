@@ -21,7 +21,7 @@ resource "null_resource" "hosts" {
 
   connection {
     type        = "ssh"
-    host        = aws_instance.web[count.index].public_ip
+    host        = self.public_ip
     user        = "ubuntu"
     private_key = file("~/.ssh/id_rsa")
     agent       = false
