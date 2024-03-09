@@ -11,7 +11,7 @@
     sonarqube_data_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/data"
     sonarqube_logs_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/logs"
     sonarqube_temp_dir: "/opt/sonarqube/sonarqube-{{ sonarqube_version }}/temp"
-    sonarqube_extract_dir: "/tmp/sonarqube"
+
   tasks:
     - name: Install unzip
       apt:
@@ -45,7 +45,6 @@
         - "{{ sonarqube_data_dir }}"
         - "{{ sonarqube_logs_dir }}"
         - "{{ sonarqube_temp_dir }}"
-        - "{{ sonarqube_extract_dir }}"
 
     - name: Download SonarQube
       get_url:
@@ -54,7 +53,7 @@
 
     - name: Extract SonarQube archive
       unarchive:
-        src: "{{ sonarqube_extract_dir }}-{{ sonarqube_version }}.zip"
+        src: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
         dest: "{{ sonarqube_install_dir }}"
         remote_src: yes
         extra_opts: --owner=sonarqube --group=sonarqube
