@@ -1,6 +1,7 @@
 ---
 - name: Install Jenkins
   hosts: jenkins_vm
+  become: yes
 
   vars:
     jenkins_repo_key: "https://pkg.jenkins.io/debian/jenkins.io.key"
