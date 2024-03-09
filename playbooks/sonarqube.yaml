@@ -17,11 +17,20 @@
         name: unzip
         state: present
 
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install fontconfig
+      apt:
+        name: fontconfig
+        state: present
+
     - name: Install OpenJDK 17
       apt:
         name: openjdk-17-jre
         state: present
-
+        
     - name: Create SonarQube directories
       file:
         path: "{{ item }}"
