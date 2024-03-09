@@ -1,15 +1,19 @@
 [Unit]
-Description=Nexus service
+Description=Nexus Repository Manager
 After=network.target
 
 [Service]
 Type=forking
 LimitNOFILE=65536
-ExecStart=/opt/nexus/bin/nexus start
-ExecStop=/opt/nexus/bin/nexus stop
 User=nexus
 Group=nexus
-Restart=on-failure
+ExecStart=/opt/nexus-3.3.0-01/bin/nexus start
+ExecStop=/opt/nexus-3.3.0-01/bin/nexus stop
+ExecReload=/opt/nexus-3.3.0-01/bin/nexus restart
+Restart=always
+RestartSec=10
+TimeoutStartSec=60
+TimeoutStopSec=30
 
 [Install]
 WantedBy=multi-user.target

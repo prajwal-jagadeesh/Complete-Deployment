@@ -1,79 +1,43 @@
 ---
-- name: Install and Run Nexus Repository Manager
-  hosts: nexus_vm
+- name: Install Nexus Repository Manager
+  hosts: nexus_servers
   become: yes
-  vars:
-    nexus_dir: /tmp/nexus 
-
   tasks:
     - name: Update apt cache
       apt:
         update_cache: yes
 
+    - name: Install fontconfig
+      apt:
+        name: fontconfig
+        state: present
+
     - name: Install OpenJDK 17
       apt:
         name: openjdk-17-jre
         state: present
-
-    - name: Create directories for Nexus
-      file:
-        path: "{{ item }}"
-        state: directory
-        mode: '0755'
-      with_items:
-        - "{{ nexus_dir }}"
-
-    - name: Download Nexus Tarball
+        
+    - name: Download Nexus Repository Manager
       get_url:
         url: "https://download.sonatype.com/nexus/3/latest-unix.tar.gz"
-        dest: /tmp/nexus/
+        dest: /tmp/nexus.tar.gz
 
-    - name: Find Nexus Tarball
-      ansible.builtin.find:
-        paths: /tmp/nexus/
-        patterns: "nexus-*.tar.gz"
-      register: nexus_tarball
-
-    - name: Extract Nexus Tarball
+    - name: Extract Nexus
       ansible.builtin.unarchive:
-        src: "{{ nexus_tarball.files[0].path }}"
+        src: /tmp/nexus.tar.gz
         dest: /opt
         remote_src: yes
-      when: nexus_tarball.matched > 0
-
-    - name: Find Nexus Tarball
-      ansible.builtin.find:
-        paths: /opt/
-        patterns: "nexus-*"
-      register: sonatype_nexus
-
-    - name: Rename Nexus Directory
-      ansible.builtin.command:
-        cmd: mv {{ sonatype_nexus.files[0].path }}" /opt/nexus/
-      when: sonatype_nexus.matched > 0
-
-    - name: Create Nexus User
-      ansible.builtin.user:
-        name: nexus
-        home: /opt/nexus
-        shell: /sbin/nologin
-
-    - name: Set Ownership of Nexus Directory
-      ansible.builtin.file:
-        path: /opt/nexus
-        owner: nexus
-        group: nexus
-        recurse: yes
+        creates: /opt/nexus-3.3.0-01
 
     - name: Configure Nexus Service
       ansible.builtin.template:
         src: nexus.service.j2
         dest: /etc/systemd/system/nexus.service
-      notify: Reload systemd
+      notify:
+        - Restart Nexus Service
 
   handlers:
-    - name: Reload systemd
-      ansible.builtin.systemd:
-        daemon_reload: yes
-        state: restarted
+    - name: Restart Nexus Service
+      systemd:
         name: nexus
+        state: restarted
