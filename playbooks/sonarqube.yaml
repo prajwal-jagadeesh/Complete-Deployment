@@ -17,9 +17,9 @@
         name: unzip
         state: present
 
-    - name: Install OpenJDK
+    - name: Install OpenJDK 17
       apt:
-        name: openjdk-11-jdk
+        name: openjdk-17-jre
         state: present
 
     - name: Create SonarQube directories
