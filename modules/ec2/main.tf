@@ -4,6 +4,7 @@ resource "aws_instance" "ec2" {
   instance_type               = var.instance_type
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.ec2-sg.id]
+  key_name                    = "webapp"
 
   tags = {
     Name = "${var.instance_names[count.index]}"
