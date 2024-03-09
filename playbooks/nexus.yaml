@@ -49,7 +49,7 @@
 
     - name: Rename Nexus Directory
       ansible.builtin.command:
-        cmd: mv {{ sonatype_nexus.files[0].path }}" /opt/nexus
+        cmd: mv {{ sonatype_nexus.files[0].path }}" /opt/nexus/
       when: sonatype_nexus.matched > 0
 
     - name: Create Nexus User
