@@ -1,35 +1,55 @@
 ---
-- name: Install Nexus Repository Manager
+- name: Install and Run Nexus Repository Manager
   hosts: nexus_vm
-  become: true
+  become: yes
+
   tasks:
     - name: Update apt cache
       apt:
         update_cache: yes
-
-    - name: Install fontconfig
-      apt:
-        name: fontconfig
-        state: present
-
-    - name: Install OpenJDK 17
-      apt:
-        name: openjdk-17-jre
-        state: present
         
-    - name: Download Nexus
+    - name: Install Java
+      package:
+        name: java-1.8.0-openjdk
+        state: present
+
+    - name: Download Nexus Tarball
       get_url:
-        url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
-        dest: /opt/nexus.tar.gz
-    - name: Unzip Nexus
-      unarchive:
-        src: /opt/nexus.tar.gz
+        url: "https://download.sonatype.com/nexus/3/latest-unix.tar.gz"
+        dest: /tmp/nexus.tar.gz
+
+    - name: Extract Nexus Tarball
+      ansible.builtin.unarchive:
+        src: /tmp/nexus.tar.gz
         dest: /opt/
         remote_src: yes
-    - name: Set Permissions
-      file:
+
+    - name: Rename Nexus Directory
+      ansible.builtin.command:
+        cmd: mv /opt/nexus-* /opt/nexus
+
+    - name: Create Nexus User
+      ansible.builtin.user:
+        name: nexus
+        home: /opt/nexus
+        shell: /sbin/nologin
+
+    - name: Set Ownership of Nexus Directory
+      ansible.builtin.file:
         path: /opt/nexus
-        state: directory
-        mode: '0755'
-    - name: Start Nexus Service
-      command: /opt/nexus/bin/nexus start
+        owner: nexus
+        group: nexus
+        recurse: yes
+
+    - name: Configure Nexus Service
+      ansible.builtin.template:
+        src: nexus.service.j2
+        dest: /etc/systemd/system/nexus.service
+      notify: Reload systemd
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        state: restarted
+        name: nexus
