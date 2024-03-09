@@ -1,6 +1,6 @@
 ---
 - name: Install Nexus Repository Manager
-  hosts: nexus_servers
+  hosts: nexus_vm
   become: yes
   tasks:
     - name: Update apt cache
@@ -16,7 +16,7 @@
       apt:
         name: openjdk-17-jre
         state: present
-        
+
     - name: Download Nexus Repository Manager
       get_url:
         url: "https://download.sonatype.com/nexus/3/latest-unix.tar.gz"
