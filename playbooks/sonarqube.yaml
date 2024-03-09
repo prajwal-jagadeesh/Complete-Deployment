@@ -56,9 +56,8 @@
         src: "{{ sonarqube_install_dir }}/sonarqube-{{ sonarqube_version }}.zip"
         dest: "{{ sonarqube_install_dir }}"
         remote_src: yes
-        extra_opts: "--owner=sonarqube --group=sonarqube"
-
-
+        owner: sonarqube
+        group: sonarqube
 
     - name: Set SonarQube directories ownership
       file:
