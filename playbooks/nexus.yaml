@@ -2,6 +2,8 @@
 - name: Install and Run Nexus Repository Manager
   hosts: nexus_vm
   become: yes
+  vars:
+    nexus_dir: /tmp/nexus 
 
   tasks:
     - name: Update apt cache
@@ -12,6 +14,14 @@
       apt:
         name: openjdk-17-jre
         state: present
+
+    - name: Create directories for Nexus
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      with_items:
+        - "{{ nexus_dir }}"
 
     - name: Download Nexus Tarball
       get_url:
