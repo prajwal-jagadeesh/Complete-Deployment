@@ -16,7 +16,6 @@ variable "instance_names" {
     "jenkins_vm",
     "sonarqube_vm",
     "nexus_vm",
-    "jenkins_slave_vm"
   ]
 }
 
