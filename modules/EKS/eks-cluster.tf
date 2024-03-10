@@ -13,7 +13,6 @@ resource "aws_eks_cluster" "my-eks-cluster" {
 }
 
 resource "aws_eks_node_group" "my-node-group" {
-  count           = 4
   cluster_name    = aws_eks_cluster.my-eks-cluster.name
   node_group_name = "${terraform.workspace}-node-group"
   node_role_arn   = aws_iam_role.eks-worker-node-role.arn
@@ -36,11 +35,6 @@ resource "aws_eks_node_group" "my-node-group" {
   }
 
   subnet_ids = [var.subnet_ids[0], var.subnet_ids[1]]
-
-  tags = {
-    Name        = "${terraform.workspace}-eks-node-${count.index}"
-    Environment = "dev"
-  }
 
   depends_on = [
     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
