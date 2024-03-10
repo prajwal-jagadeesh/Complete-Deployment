@@ -1,6 +1,6 @@
 ---
 - name: Install Jenkins
-  hosts: jenkins_vm
+  hosts: jenkins_slave_vm
   become: yes
   tasks:
     - name: Update apt cache
