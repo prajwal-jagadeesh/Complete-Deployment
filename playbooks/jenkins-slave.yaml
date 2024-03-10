@@ -1,6 +1,6 @@
 ---
 - name: Install Jenkins
-  hosts: jenkins_slave_vm
+  hosts: jenkins_vm
   become: yes
   tasks:
     - name: Update apt cache
@@ -15,6 +15,62 @@
     - name: Install OpenJDK 17
       apt:
         name: openjdk-17-jre
+        state: present
+
+    - name: Download Jenkins repository key
+      get_url:
+        url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key"
+        dest: "/usr/share/keyrings/jenkins-keyring.asc"
+
+    - name: Add Jenkins repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: "jenkins"
+
+    - name: Update apt cache after adding Jenkins repository
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Start Jenkins service
+      service:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: Install prerequisites for Trivy
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - wget
+        - apt-transport-https
+        - gnupg
+        - lsb-release
+
+    - name: Add Trivy GPG key
+      apt_key:
+        url: https://aquasecurity.github.io/trivy-repo/deb/public.key
+        state: present
+
+    - name: Add Trivy repository
+      apt_repository:
+        repo: "deb https://aquasecurity.github.io/trivy-repo/deb {{ ansible_lsb.codename }} main"
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Trivy
+      apt:
+        name: trivy
         state: present
 
     - name: Install Docker prerequisites
@@ -52,3 +108,14 @@
       file:
         path: /var/run/docker.sock
         mode: '0777'
+
+    - name: Install snapd
+      apt:
+        name: snapd
+        state: present
+
+    - name: Install kubectl using snap
+      snap:
+        name: kubectl
+        classic: yes
+
