@@ -43,3 +43,33 @@
         name: jenkins
         state: started
         enabled: yes
+
+    - name: Install prerequisites for Trivy
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - wget
+        - apt-transport-https
+        - gnupg
+        - lsb-release
+
+    - name: Add Trivy GPG key
+      apt_key:
+        url: https://aquasecurity.github.io/trivy-repo/deb/public.key
+        state: present
+
+    - name: Add Trivy repository
+      apt_repository:
+        repo: "deb https://aquasecurity.github.io/trivy-repo/deb {{ ansible_lsb.codename }} main"
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Trivy
+      apt:
+        name: trivy
+        state: present
+
