@@ -36,6 +36,13 @@ resource "aws_eks_node_group" "my-node-group" {
 
   subnet_ids = [var.subnet_ids[0], var.subnet_ids[1]]
 
+  tags = merge(
+    var.common_tags,
+    {
+      "Name" = "${terraform.workspace}-node"
+    }
+  )
+
   depends_on = [
     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
