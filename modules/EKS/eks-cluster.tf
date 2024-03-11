@@ -39,7 +39,7 @@ resource "aws_eks_node_group" "my-node-group" {
   tags = merge(
     var.common_tags,
     {
-      "Name" = "${terraform.workspace}-node"
+      "Name" = "${terraform.workspace}-eks-node"
     }
   )
 
